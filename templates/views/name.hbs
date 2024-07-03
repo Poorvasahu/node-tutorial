@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+ <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color:yellown;
+        }
+    </style>
+</head>
+
+<body>
+   <h1>hello {{loggedInUser}} </h1>
+    <h1>Student Table</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>college</th>
+                <th>password</th>
+            </tr>
+        </thead>
+        <tbody id="studentTable">
+        </tbody>
+    </table>
+
+    <script>
+        function deleteStudent(id) {
+            fetch(`/delete?id=${id}`, { method: 'DELETE' })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Student deleted successfully!");
+                        console.log("deleted successful")
+                        window.location.reload();
+                    } else {
+                        console.error('Failed to delete student');
+                    }
+                })
+                .catch(error => console.error('Error during delete request:', error));
+        }
+
+        fetch('/getStudent')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('studentTable');
+                data.map(student => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${student.id}</td>
+                        <td>${student.name}</td>
+                        <td>${student.college}</td>
+                        <td>${student.password}</td>
+                        <td>
+                            <button onclick="deleteStudent(${student.id})">Delete</button>
+                            <button onclick="window.location.href='/edit/{{student.id}}'">Edit</button>
+                             <button><a href='/view/{{student.id}}'>VIEW</button>
+                        </td>`;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+    <button>
+        <a href="/logout">Logout</a>
+    </button>
+</body>
+</html>
